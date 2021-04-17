@@ -46,14 +46,12 @@
 ;; FIXME: SBCL doesn't call the compiler-macro on APPLY, does anyone do it?
 (define-polymorphic-function aref (array &rest subscripts) :overwrite t)
 (defpolymorph aref ((array cl:array) &rest subscripts) t
-  (declare (dynamic-extent subscripts)
-           (optimize speed))
+  (declare (dynamic-extent subscripts))
   (apply #'cl:aref array subscripts))
 
 (define-polymorphic-function (setf aref) (new array &rest subscripts) :overwrite t)
 (defpolymorph (setf aref) (new (array cl:array) &rest subscripts) t
-  (declare (dynamic-extent subscripts)
-           (optimize speed))
+  (declare (dynamic-extent subscripts))
   (setf (apply #'cl:aref array subscripts) new))
 
 
