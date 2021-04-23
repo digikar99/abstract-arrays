@@ -54,6 +54,17 @@
   (declare (dynamic-extent subscripts))
   (setf (apply #'cl:aref array subscripts) new))
 
+(define-polymorphic-function row-major-aref (array index) :overwrite t
+  :documentation
+  "Return the element of ARRAY corresponding to the row-major INDEX.
+This is SETFable")
+(defpolymorph row-major-aref ((array cl:array) index) t
+  (cl:row-major-aref array index))
+
+(define-polymorphic-function (setf row-major-aref) (new array index) :overwrite t)
+(defpolymorph (setf row-major-aref) (new (array cl:array) index) t
+  (setf (cl:row-major-aref array index) new))
+
 
 ;;; TODO: Implement these for CLHS arrays
 ;;; FIXME: This isn't the fastest way of ref-ing. See dense-arrays backends.

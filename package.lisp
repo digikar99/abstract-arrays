@@ -13,6 +13,7 @@
                              arrayp
 
                              aref
+                             row-major-aref
                              
                              define-array-specializations
                              define-array-specialization-type
