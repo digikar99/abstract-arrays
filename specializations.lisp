@@ -23,10 +23,13 @@
 
 (defmacro define-array-element-type-specialization (element-type)
   (let* ((fn-name      (element-type-p-fn-name element-type)))
-    `(defun ,fn-name (object)
-       (and (abstract-array-p object)
-            (alexandria:type= ',element-type
-                              (abstract-array-element-type object))))))
+    (if (eq 'cl:* element-type)
+        `(defun ,fn-name (object)
+           (abstract-array-p object))
+        `(defun ,fn-name (object)
+           (and (abstract-array-p object)
+                (alexandria:type= ',element-type
+                                  (abstract-array-element-type object)))))))
 
 (defmacro define-array-rank-specialization (rank)
   (check-type rank (or (eql cl:*) (integer 0 #.array-rank-limit)))
@@ -40,18 +43,19 @@
 using SATISFIES type."
   `(deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
      (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
-     (cond ((and rankp elt-supplied-p)
-            `(and ,',base-type
-                  (satisfies ,(element-type-p-fn-name element-type))
-                  (satisfies ,(rank-p-fn-name rank))))
-           (elt-supplied-p
-            `(and ,',base-type
-                  (satisfies ,(element-type-p-fn-name element-type))))
-           (rankp                       ; never invoked though
-            `(and ,',base-type
-                  (satisfies ,(rank-p-fn-name rank))))
-           (t
-            ',base-type))))
+     (let ((*package* (find-package :abstract-arrays)))
+       (cond ((and rankp elt-supplied-p)
+              `(and ,',base-type
+                    (satisfies ,(element-type-p-fn-name element-type))
+                    (satisfies ,(rank-p-fn-name rank))))
+             (elt-supplied-p
+              `(and ,',base-type
+                    (satisfies ,(element-type-p-fn-name element-type))))
+             (rankp                       ; never invoked though
+              `(and ,',base-type
+                    (satisfies ,(rank-p-fn-name rank))))
+             (t
+              ',base-type)))))
 
 (defun array-type-element-type (array-type &optional env)
   (let ((array-type (introspect-environment:typexpand array-type env)))
@@ -118,5 +122,6 @@ using SATISFIES type."
       (signed-byte 64)
       (signed-byte 32)
       bit
-      t)
+      t
+      cl:*)
      #.(cons 'cl:* (loop :for i :below 8 :collect i))))
