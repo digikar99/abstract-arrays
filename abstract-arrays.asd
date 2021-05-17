@@ -7,6 +7,7 @@
   :serial t
   :components ((:file "pre-package")
                (:file "package")
-               (:file "protocol")
-               (:file "abstract-arrays")
+               (:file "abstract-array-ordered-class")
+               (:file "abstract-array")
+               (:file "remaining-protocol")
                (:file "specializations")))
