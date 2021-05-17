@@ -2,6 +2,8 @@
 
 ;;; By providing these in the form of polymorphic-functions allows us to
 ;;; provide wrappers around the CLHS functions
+;;; In addition, polymorphs also allow us to install compiler-macros. These
+;;; have been put to use in DENSE-ARRAYS system.
 
 (macrolet ((def (name return-type)
              `(progn
@@ -9,9 +11,7 @@
                 (defpolymorph ,name ((array cl:array)) ,return-type
                   (,(find-symbol (symbol-name name) :cl) array))
                 (defpolymorph ,name ((array abstract-array)) ,return-type
-                  (,(find-symbol (uiop:strcat "ABSTRACT-" (symbol-name name))
-                                 :abstract-arrays)
-                   array)))))
+                  (slot-value array ',(intern (subseq (symbol-name name) 6)))))))
   (def array-dimensions   list)
   (def array-rank         (integer 0 #.array-rank-limit))
   (def array-element-type t)
@@ -20,7 +20,7 @@
 ;;; Redefine and copy-list, because, we don't want users
 ;;; to assume destructive modification is okay
 (defpolymorph array-dimensions ((array abstract-array)) list
-  (copy-list (abstract-array-dimensions array)))
+  (copy-list (slot-value array 'dimensions)))
 
 
 
@@ -33,13 +33,13 @@
 (declaim (inline arrayp))
 (defun arrayp (object)
   (or (cl:arrayp object)
-      (abstract-array-p object)))
+      (typep object 'abstract-array)))
 
 (declaim (inline array-storage))
 (define-polymorphic-function array-storage (array) :overwrite t)
 (defpolymorph array-storage ((abstract-array abstract-array)) t
   (declare (optimize speed))
-  (abstract-array-storage abstract-array))
+  (slot-value abstract-array 'storage))
 
 
 

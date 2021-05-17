@@ -25,18 +25,18 @@
   (let* ((fn-name      (element-type-p-fn-name element-type)))
     (if (eq 'cl:* element-type)
         `(defun ,fn-name (object)
-           (abstract-array-p object))
+           (typep object 'abstract-array))
         `(defun ,fn-name (object)
-           (and (abstract-array-p object)
+           (and (typep object 'abstract-array)
                 (alexandria:type= ',element-type
-                                  (abstract-array-element-type object)))))))
+                                  (array-element-type object)))))))
 
 (defmacro define-array-rank-specialization (rank)
   (check-type rank (or (eql cl:*) (integer 0 #.array-rank-limit)))
   (let ((fn-name (rank-p-fn-name rank)))
     `(defun ,fn-name (object)
-       (and (abstract-array-p object)
-            (= ,rank (abstract-array-rank object))))))
+       (and (typep object 'abstract-array)
+            (= ,rank (array-rank object))))))
 
 (defmacro define-array-specialization-type (type &optional (base-type 'abstract-array))
     "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
