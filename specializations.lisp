@@ -40,7 +40,7 @@
 
 (defmacro define-array-specialization-type (type &optional (base-type 'abstract-array))
     "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
-using SATISFIES type."
+using SATISFIES type. For an example, see DENSE-ARRAYS:ARRAY"
   `(deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
      (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
      (let ((*package* (find-package :abstract-arrays)))
@@ -58,6 +58,10 @@ using SATISFIES type."
               ',base-type)))))
 
 (defun array-type-element-type (array-type &optional env)
+    "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-ELEMENT-TYPE; returns the
+actual ELEMENT-TYPE corresponding to ARRAY-RANK in ENV.
+ARRAY-TYPE is expected to be a subtype of ABSTRACT-ARRAY.
+See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
   (let ((array-type (introspect-environment:typexpand array-type env)))
     (assert (subtypep array-type 'abstract-array)
             ()
@@ -81,6 +85,10 @@ using SATISFIES type."
         'cl:*)))
 
 (defun array-type-rank (array-type &optional env)
+  "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-RANK; returns the actual RANK
+corresponding to ARRAY-RANK in ENV.
+ARRAY-TYPE is expected to be a subtype of ABSTRACT-ARRAY.
+See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
   (let ((array-type (introspect-environment:typexpand array-type env)))
     (assert (subtypep array-type 'abstract-array)
             ()
@@ -105,6 +113,8 @@ using SATISFIES type."
 
 ;; For user consumption
 (defmacro define-array-specializations ((&rest element-types) (&rest ranks))
+  "Defines PREDICATES corresponding to each ELEMENT-TYPE and RANK (not their pairs).
+The predicates of the two kinds will be independent of each other."
   `(progn
      ,@(loop :for e :in element-types
              :collect `(define-array-element-type-specialization ,e))

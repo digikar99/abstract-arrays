@@ -1,5 +1,8 @@
 
 (defsystem "abstract-arrays"
+  :author "Shubhamkar B. Ayare (shubhamayare@yahoo.co.in)"
+  :version "0.1.0"
+  :licence "MIT"
   :depends-on ("adhoc-polymorphic-functions"
                "alexandria"
                "closer-mop"

@@ -1,20 +1,57 @@
 
 # abstract-arrays
 
-Why adhoc-polymorphic-functions? 
+This system/library provides an `abstract-array` package with:
 
-IIUC, a generic-function that specializes on both `abstract-array` and a child class/structure of `abstract-array` (eg. `dense-array`) cannot be sealed, and thus is not amenable to inline optimization by fast-generic-functions.
+> Beta
 
-static-dispatch, as of yet, provides no compiler notes for optimization purposes.
+- a metaclass `abstract-array-class`
+- a class `abstract-array` with slots
+  - storage
+  - dimensions
+  - element-type
+  - rank
+  - total-size
 
-This is apart from the fact that as of SBCL 2.1.1, there is no way to specialize generic-functions on specialized arrays.
+- slot readers:
+  - array-storage
+  - array-dimensions
+  - array-rank
+  - array-element-type
+  - array-total-size
 
-## Dependencies outside quicklisp
+- array operators:
+  - aref and (setf aref)
+  - row-major-aref and (setf row-major-aref)
 
-- [adhoc-polymorphic-functions](https://github.com/digikar99/adhoc-polymorphic-functions/)
-- my copy of [trivial-types](https://github.com/digikar99/trivial-types/) (original has been archived by the author)
+- predicate:
+  - arrayp
 
-## Documentation
+- compile time facilities:
+  - define-array-specializations
+  - define-array-specialization-type
+  - array-type-element-type
+  - array-type-rank
 
-TODO (Raise an issue if this interests you, so I can consider increasing the priority for documentation. An example is [dense-arrays/src/package.lisp](https://github.com/digikar99/dense-arrays/blob/main/src/package.lisp).)
+> Alpha: Will potentially be removed
 
+- array operators:
+  - array-storage-ref
+  - array-storage-set
+
+
+The slot-readers and array-operators are implemented using [adhoc-polymorphic-functions](https://github.com/digikar99/adhoc-polymorphic-functions/) to allow for [more-or-less] portable inlining and installation of compiler-macros wherever appropriate. An attempt has also been made to optimize slot accesses using ordered-class discovered at [mfiano/zed](https://git.mfiano.net/mfiano/zed/src/branch/master/src/util-ordered-class.lisp).
+
+The system also wraps around the CL symbols with the same names. Thus, for example, `abstract-arrays:array-dimensions` when compiled with appropriate type declarations is as efficient as `cl:array-dimensions`.
+
+## Installation
+
+Follow the instructions at https://github.com/digikar99/adhoc-polymorphic-functions/#getting-it-from-ultralisp
+
+## Usage
+
+1. Firstly subclass `abstract-array-class` to create the metaclass `my-array-class` for your own array.
+2. Subclass `abstract-array` class with metaclass as `my-array-metaclass` to create the class `my-array`. This `abstract-array` class may have additional slots as per its requirements.
+3. Implement polymorphs for `aref`, `(setf aref)`, `row-major-aref` and `(setf row-major-aref)`.
+
+The system of metaclass and class was chosen as it aids in customizing the behavior of `my-array`. For an extensive example, see [dense-arrays](https://github.com/digikar99/dense-arrays).
