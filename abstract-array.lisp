@@ -59,3 +59,11 @@ This is substituted with a error-ing :initform."
    (total-size   :required t :type (integer 0 #.array-total-size-limit)
                  :polymorph t :reader array-total-size))
   (:order #.+abstract-array-slot-order+))
+
+(defmacro define-array-class (name &body (direct-slots . slot-options))
+  "Defines NAME as a CLASS with DIRECT-SUPERCLASS ABSTRACT-ARRAY and metaclass
+as ABSTRACT-ARRAY-CLASS. Also defines the appropriate order using DIRECT-SLOTS."
+  `(define-ordered-class-with-required-slots ,name (abstract-array)
+     ,direct-slots
+     (:order ,(append +abstract-array-slot-order+ (mapcar #'first direct-slots)))
+     ,@slot-options))

@@ -16,6 +16,7 @@
                              #:aref
                              #:row-major-aref
 
+                             #:define-array-class
                              #:define-array-specializations
                              #:define-array-specialization-type
                              #:array-type-element-type

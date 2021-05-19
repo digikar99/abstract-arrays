@@ -34,14 +34,19 @@
 (defmacro define-array-rank-specialization (rank)
   (check-type rank (or (eql cl:*) (integer 0 #.array-rank-limit)))
   (let ((fn-name (rank-p-fn-name rank)))
-    `(defun ,fn-name (object)
-       (and (typep object 'abstract-array)
-            (= ,rank (array-rank object))))))
+    (if (eq 'cl:* rank)
+        `(defun ,fn-name (object)
+           (typep object 'abstract-array))
+        `(defun ,fn-name (object)
+           (and (typep object 'abstract-array)
+                (= ,rank
+                   (array-rank object)))))))
 
 (defmacro define-array-specialization-type (type &optional (base-type 'abstract-array))
     "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
 using SATISFIES type. For an example, see DENSE-ARRAYS:ARRAY"
   `(deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
+     (when (listp rank) (setq rank (length rank)))
      (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
      (let ((*package* (find-package :abstract-arrays)))
        (cond ((and rankp elt-supplied-p)
