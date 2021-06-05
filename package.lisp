@@ -23,7 +23,7 @@
                              #:array-type-rank)))
 
     `(uiop:define-package :abstract-arrays
-         (:mix :cl :adhoc-polymorphic-functions)
+         (:mix :cl :polymorphic-functions)
        (:shadow ,@export-symbols)
        (:export ,@export-symbols)))
 
