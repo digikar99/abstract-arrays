@@ -121,9 +121,10 @@
 (defmacro define-ordered-class (name super-classes &body (slots . options))
   (let ((order (cadr (find :order options :key #'car))))
     `(progn
-       (defclass ,name ,super-classes
-         ,(generate-ordered-class-slot-specifiers slots order)
-         ,@(generate-ordered-class-options order options))
+       (eval-when (:compile-toplevel :load-toplevel :execute)
+         (defclass ,name ,super-classes
+           ,(generate-ordered-class-slot-specifiers slots order)
+           ,@(generate-ordered-class-options order options)))
        ,@(generate-ordered-class-fast-accessors name slots order))))
 
 
