@@ -133,9 +133,13 @@ The predicates of the two kinds will be independent of each other."
       double-float
       (unsigned-byte 64)
       (unsigned-byte 32)
+      (unsigned-byte 16)
       (unsigned-byte 08)
       (signed-byte 64)
       (signed-byte 32)
+      (signed-byte 16)
+      (signed-byte 08)
+      nil
       bit
       t
       cl:*)
