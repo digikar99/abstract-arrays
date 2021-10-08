@@ -60,6 +60,14 @@ This is substituted with a error-ing :initform."
                  :polymorph t :reader array-total-size))
   (:order #.+abstract-array-slot-order+))
 
+#+sbcl
+(defmethod slot-unbound (class
+                         (instance abstract-array-class)
+                         (slot-name (eql 'sb-pcl::%class-precedence-list)))
+  ;; FIXME: Is this correct?
+  (setf (slot-value instance slot-name)
+        (mapcar #'find-class '(abstract-array t))))
+
 (defmacro define-array-class (name &body (direct-slots . slot-options))
   "Defines NAME as a CLASS with DIRECT-SUPERCLASS ABSTRACT-ARRAY and metaclass
 as ABSTRACT-ARRAY-CLASS. Also defines the appropriate order using DIRECT-SLOTS."
