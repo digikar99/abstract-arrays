@@ -50,6 +50,8 @@ This is substituted with a error-ing :initform."
 (define-ordered-class-with-required-slots abstract-array ()
   ((storage      :required t
                  :polymorph t :reader array-storage)
+   ;; This list is not expected to be modified; therefore, we do a bit unusual thing
+   ;; to bring attention of the user
    (dimensions   :required t :type list
                  :polymorph nil :reader abstract-array-dimensions)
    (element-type :required t
@@ -59,6 +61,17 @@ This is substituted with a error-ing :initform."
    (total-size   :required t :type (integer 0 #.array-total-size-limit)
                  :polymorph t :reader array-total-size))
   (:order #.+abstract-array-slot-order+))
+
+(setf (documentation 'abstract-array-dimensions 'function)
+      "Access the DIMENSIONS list of the ABSTRACT-ARRAY. Destructively modifying
+this list would result in a change in the DIMENSIONS of the array; hence use
+this only for read-only access to the DIMENSIONS.")
+
+;; FIXME: This does not work with displaced arrays
+(defpolymorph array-storage ((array cl:array)) cl:vector
+  (declare (ignorable array))
+  #+sbcl (sb-ext:array-storage-vector array)
+  #-sbcl (error "ARRAY-STORAGE not implemented for CL:ARRAY!"))
 
 #+sbcl
 (defmethod slot-unbound (class

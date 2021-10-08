@@ -7,6 +7,7 @@
                              #:array-storage-set
 
                              #:array-dimensions
+                             #:abstract-array-dimensions
                              #:array-dimension
                              #:array-rank
                              #:array-element-type

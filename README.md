@@ -15,7 +15,7 @@ This system/library provides an `abstract-array` package with:
 
 - slot readers:
   - array-storage
-  - array-dimensions
+  - abstract-array-dimensions
   - array-rank
   - array-element-type
   - array-total-size
