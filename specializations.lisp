@@ -23,24 +23,28 @@
 
 (defmacro define-array-element-type-specialization (element-type)
   (let* ((fn-name      (element-type-p-fn-name element-type)))
-    (if (eq 'cl:* element-type)
-        `(defun ,fn-name (object)
-           (typep object 'abstract-array))
-        `(defun ,fn-name (object)
-           (and (typep object 'abstract-array)
-                (alexandria:type= ',element-type
-                                  (array-element-type object)))))))
+    `(progn
+       (declaim (inline ,fn-name))
+       ,(if (eq 'cl:* element-type)
+            `(defun ,fn-name (object)
+               (typep object 'abstract-array))
+            `(defun ,fn-name (object)
+               (and (typep object 'abstract-array)
+                    (alexandria:type= ',element-type
+                                      (array-element-type (the abstract-array object)))))))))
 
 (defmacro define-array-rank-specialization (rank)
   (check-type rank (or (eql cl:*) (integer 0 #.array-rank-limit)))
   (let ((fn-name (rank-p-fn-name rank)))
-    (if (eq 'cl:* rank)
-        `(defun ,fn-name (object)
-           (typep object 'abstract-array))
-        `(defun ,fn-name (object)
-           (and (typep object 'abstract-array)
-                (= ,rank
-                   (array-rank object)))))))
+    `(progn
+       (declaim (inline ,fn-name))
+       ,(if (eq 'cl:* rank)
+            `(defun ,fn-name (object)
+               (typep object 'abstract-array))
+            `(defun ,fn-name (object)
+               (and (typep object 'abstract-array)
+                    (= ,rank
+                       (array-rank (the abstract-array object)))))))))
 
 (defmacro define-array-specialization-type (type &optional (base-type 'abstract-array))
     "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
@@ -127,20 +131,19 @@ The predicates of the two kinds will be independent of each other."
              :collect `(define-array-rank-specialization ,rank))))
 
 ;; Some preprovided specializations
-(ignore-errors
- (define-array-specializations
-     (single-float
-      double-float
-      (unsigned-byte 64)
-      (unsigned-byte 32)
-      (unsigned-byte 16)
-      (unsigned-byte 08)
-      (signed-byte 64)
-      (signed-byte 32)
-      (signed-byte 16)
-      (signed-byte 08)
-      nil
-      bit
-      t
-      cl:*)
-     #.(cons 'cl:* (loop :for i :below 8 :collect i))))
+(define-array-specializations
+    (single-float
+     double-float
+     (unsigned-byte 64)
+     (unsigned-byte 32)
+     (unsigned-byte 16)
+     (unsigned-byte 08)
+     (signed-byte 64)
+     (signed-byte 32)
+     (signed-byte 16)
+     (signed-byte 08)
+     nil
+     bit
+     t
+     cl:*)
+    #.(cons 'cl:* (loop :for i :below 8 :collect i)))
