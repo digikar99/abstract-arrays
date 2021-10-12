@@ -144,6 +144,7 @@ The predicates of the two kinds will be independent of each other."
      (signed-byte 08)
      nil
      bit
+     fixnum
      t
      cl:*)
     #.(cons 'cl:* (loop :for i :below 8 :collect i)))
