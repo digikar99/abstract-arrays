@@ -49,22 +49,38 @@
 (defmacro define-array-specialization-type (type &optional (base-type 'abstract-array))
     "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
 using SATISFIES type. For an example, see DENSE-ARRAYS:ARRAY"
-  `(deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
-     (when (listp rank) (setq rank (length rank)))
-     (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
-     (let ((*package* (find-package :abstract-arrays)))
-       (cond ((and rankp elt-supplied-p)
-              `(and ,',base-type
-                    (satisfies ,(element-type-p-fn-name element-type))
-                    (satisfies ,(rank-p-fn-name rank))))
-             (elt-supplied-p
-              `(and ,',base-type
-                    (satisfies ,(element-type-p-fn-name element-type))))
-             (rankp                       ; never invoked though
-              `(and ,',base-type
-                    (satisfies ,(rank-p-fn-name rank))))
-             (t
-              ',base-type)))))
+  `(progn
+     (deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
+       (when (listp rank) (setq rank (length rank)))
+       (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
+       (let ((*package* (find-package :abstract-arrays)))
+         (cond ((and rankp elt-supplied-p)
+                `(and ,',base-type
+                      (satisfies ,(element-type-p-fn-name element-type))
+                      (satisfies ,(rank-p-fn-name rank))))
+               (elt-supplied-p
+                `(and ,',base-type
+                      (satisfies ,(element-type-p-fn-name element-type))))
+               (rankp                   ; never invoked though
+                `(and ,',base-type
+                      (satisfies ,(rank-p-fn-name rank))))
+               (t
+                ',base-type))))
+     (let ((gensym (gensym (concatenate 'string (symbol-name ',type)
+                                        "-SUBTYPE-P"))))
+       ;; FIXME: This isn't the nicest way to do this!
+       (compile gensym (lambda (type1 type2 &optional env)
+                         (declare (ignore env))
+                         (cond ((not (and (subtypep type1 ',base-type)
+                                          (subtypep type2 ',base-type)))
+                                (values nil nil))
+                               ((alexandria:type= type1 type2)
+                                (values t t))
+                               ((member type2 '(nil t) :test #'alexandria:type=)
+                                (values t t))
+                               (t
+                                (values nil t)))))
+       (push gensym polymorphic-functions.extended-types:*extended-subtypep-functions*))))
 
 (defun array-type-element-type (array-type &optional env)
     "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-ELEMENT-TYPE; returns the
