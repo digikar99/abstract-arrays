@@ -2,24 +2,29 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
 
+  (defvar *element-type-p-fn-name-element-type-alist* nil)
+  (defvar *rank-p-fn-name-rank-alist* nil)
+
   (defun element-type-p-fn-name (element-type)
-    (intern (uiop:strcat "ABSTRACT-ARRAY-ELEMENT-TYPE-"
-                         (write-to-string (introspect-environment:typexpand element-type))
-                         "-P")
-            (find-package :abstract-arrays)))
+    (let* ((element-type (introspect-environment:typexpand element-type))
+           (fn-name (intern (uiop:strcat "ABSTRACT-ARRAY-ELEMENT-TYPE-"
+                                         (write-to-string element-type)
+                                         "-P")
+                            (find-package :abstract-arrays))))
+      (pushnew (cons fn-name element-type)
+               *element-type-p-fn-name-element-type-alist*
+               :key #'car)
+      fn-name))
 
   (defun rank-p-fn-name (rank)
-    (intern (uiop:strcat "ABSTRACT-ARRAY-RANK-"
-                         (write-to-string rank)
-                         "-P")
-            (find-package :abstract-arrays)))
-
-  (defun intersection-type-types (type &optional env)
-    (let ((type (introspect-environment:typexpand type env)))
-      (if (and (listp type) (eq 'and (first type)))
-          (loop :for type :in (rest type)
-                :appending (intersection-type-types type env))
-          (list type)))))
+    (let ((fn-name (intern (uiop:strcat "ABSTRACT-ARRAY-RANK-"
+                                        (write-to-string rank)
+                                        "-P")
+                           (find-package :abstract-arrays))))
+      (pushnew (cons fn-name rank)
+               *rank-p-fn-name-rank-alist*
+               :key #'car)
+      fn-name)))
 
 (defmacro define-array-element-type-specialization (element-type)
   (let* ((fn-name      (element-type-p-fn-name element-type)))
@@ -94,18 +99,9 @@ See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
             array-type)
     (if (and (listp array-type)
              (eq 'and (first array-type)))
-        (loop :for clause :in (intersection-type-types array-type)
-              :if (and (listp clause)
-                       (eq 'satisfies (first clause)))
-                :do (let* ((fn-name (symbol-name (second clause)))
-                           (prefix  "ABSTRACT-ARRAY-ELEMENT-TYPE-")
-                           (elt-pos (search prefix fn-name))
-                           (start-pos (length prefix))
-                           (end-pos (search "-P" fn-name)))
-                      (when (and elt-pos end-pos)
-                        (return-from array-type-element-type
-                          (let ((*read-eval* nil))
-                            (read-from-string (subseq fn-name start-pos end-pos))))))
+        (loop :for (element-type-p-fn-name . element-type) :in *element-type-p-fn-name-element-type-alist*
+              :if (subtypep array-type `(satisfies ,element-type-p-fn-name))
+                :do (return-from array-type-element-type element-type)
               :finally (return-from array-type-element-type 'cl:*))
         'cl:*)))
 
@@ -121,18 +117,9 @@ See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
             array-type)
     (if (and (listp array-type)
              (eq 'and (first array-type)))
-        (loop :for clause :in (intersection-type-types array-type)
-              :if (and (listp clause)
-                       (eq 'satisfies (first clause)))
-                :do (let* ((fn-name (symbol-name (second clause)))
-                           (prefix  "ABSTRACT-ARRAY-RANK-")
-                           (elt-pos (search prefix fn-name))
-                           (start-pos (length prefix))
-                           (end-pos (search "-P" fn-name)))
-                      (when (and elt-pos end-pos)
-                        (return-from array-type-rank
-                          (let ((*read-eval* nil))
-                            (read-from-string (subseq fn-name start-pos end-pos))))))
+        (loop :for (rank-p-fn-name . rank) :in *rank-p-fn-name-rank-alist*
+              :if (subtypep array-type `(satisfies ,rank-p-fn-name))
+                :do (return-from array-type-rank rank)
               :finally (return-from array-type-rank 'cl:*))
         'cl:*)))
 
