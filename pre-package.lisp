@@ -29,4 +29,5 @@
     #:define-array-specializations
     #:define-array-specialization-type
     #:array-type-element-type
-    #:array-type-rank))
+    #:array-type-rank
+    #:array-type-dimensions))

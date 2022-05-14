@@ -5,6 +5,7 @@
   :licence "MIT"
   :depends-on ("polymorphic-functions"
                "alexandria"
+               (:feature :extensible-compound-types "extensible-compound-types-cl")
                "closer-mop"
                "introspect-environment")
   :serial t
@@ -13,4 +14,7 @@
                (:file "abstract-array-ordered-class")
                (:file "abstract-array")
                (:file "remaining-protocol")
-               (:file "specializations")))
+               #-extensible-compound-types
+               (:file "specializations-cl")
+               #+extensible-compound-types
+               (:file "specializations-excl")))

@@ -76,12 +76,12 @@ using SATISFIES type. For an example, see DENSE-ARRAYS:ARRAY"
        ;; FIXME: This isn't the nicest way to do this!
        (compile gensym (lambda (type1 type2 &optional env)
                          (declare (ignore env))
-                         (cond ((not (and (subtypep type1 ',base-type)
-                                          (subtypep type2 ',base-type)))
+                         (cond ((not (and (polymorphic-functions.extended-types:subtypep type1 ',base-type)
+                                          (polymorphic-functions.extended-types:subtypep type2 ',base-type)))
                                 (values nil nil))
-                               ((alexandria:type= type1 type2)
+                               ((polymorphic-functions.extended-types:type= type1 type2)
                                 (values t t))
-                               ((member type2 '(nil t) :test #'alexandria:type=)
+                               ((member type2 '(nil t) :test #'polymorphic-functions.extended-types:type=)
                                 (values t t))
                                (t
                                 (values nil t)))))
@@ -122,6 +122,15 @@ See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
                 :do (return-from array-type-rank rank)
               :finally (return-from array-type-rank 'cl:*))
         'cl:*)))
+
+(defun array-type-dimensions (array-type &optional env)
+  "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-DIMENSIONS; returns the actual DIMENSIONS
+corresponding to ARRAY-DIMENSIONS in ENV.
+ARRAY-TYPE is expected to be a subtype of ABSTRACT-ARRAY.
+See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
+  (declare (ignore array-type env))
+  (error "ARRAY-TYPE-DIMENSIONS requires ABSTRACT-ARRAYS to be compiled with
+:EXTENSIBLE-COMPOUND-TYPES in CL:*FEATURES*"))
 
 ;; For user consumption
 (defmacro define-array-specializations ((&rest element-types) (&rest ranks))
