@@ -63,8 +63,8 @@ Example, see DENSE-ARRAYS:ARRAY."
   `(progn
 
      (define-compound-type ,type (o
-                                  &optional (element-type 'cl:* elt-supplied-p)
-                                  (dim/rank 'cl:* dim/rankp))
+                                  &optional (element-type 'cl:*)
+                                  (dim/rank 'cl:*))
        (and (cl:typep o ',base-type)
             (locally (declare (type ,base-type o))
               (or (eq 'cl:* element-type)
@@ -80,6 +80,67 @@ Example, see DENSE-ARRAYS:ARRAY."
                                         (= (the fixnum d1)
                                            (the fixnum d2)))))))))
 
+     (defmethod %subtypep ((n1 (eql ',type)) (n2 (eql 'sequence)) t1 t2 &optional env)
+       (declare (ignore n1 n2 t1 t2 env))
+       (values nil t))
+     (defmethod %subtypep ((n1 (eql 'sequence)) (n2 (eql ',type)) t1 t2 &optional env)
+       (declare (ignore n1 n2 t1 t2 env))
+       (values nil t))
+     (defmethod %intersect-type-p ((n1 (eql ',type)) (n2 (eql 'sequence)) t1 t2 &optional env)
+       (declare (ignore n1 n2 t1 t2 env))
+       (values t t))
+     (defmethod %intersect-type-p ((n1 (eql 'sequence)) (n2 (eql ',type)) t1 t2 &optional env)
+       (declare (ignore n1 n2 t1 t2 env))
+       (values t t))
+
+     (defmethod %subtypep ((n1 (eql ',type)) (n2 (eql 'abstract-array)) t1 t2 &optional env)
+       (declare (ignore n1 n2 t1 t2 env))
+       (values t t))
+
+     (defmethod %intersect-type-p
+         ((t1 (eql ',type)) t2 type1 type2 &optional env)
+       (declare (ignore t1 type1))
+       ;; T2 is guaranteed to be type-expanded and be a symbol
+       (if (and (or (symbolp type2)
+                    (and (listp type2)
+                         (car type2)
+                         (null (cdr type2))))
+                (find-class t2 nil env))
+           (multiple-value-bind (nullp knownp)
+               (cl:subtypep `(and ,',base-type ,t2) nil env)
+             (values (not nullp) knownp))
+           (call-next-method)))
+     (defmethod %intersect-type-p
+         (t1 (t2 (eql ',type)) type1 type2 &optional env)
+       (%intersect-type-p t2 t1 type2 type1 env))
+
+     (defmethod %subtypep
+         ((t1 (eql ',type)) t2 type1 type2 &optional env)
+       (declare (ignore t1 type1))
+       ;; T2 is guaranteed to be type-expanded and be a symbol
+       (if (and (or (symbolp type2)
+                    (and (listp type2)
+                         (car type2)
+                         (null (cdr type2))))
+                (find-class t2 nil env))
+           (multiple-value-bind (subtypep knownp)
+               (cl:subtypep ',base-type t2 env)
+             (values subtypep knownp))
+           (call-next-method)))
+     (defmethod %subtypep
+         (t1 (t2 (eql ',type)) type1 type2 &optional env)
+       (declare (ignore t2 type2))
+       ;; T2 is guaranteed to be type-expanded and be a symbol
+       (if (and (or (symbolp type1)
+                    (and (listp type1)
+                         (car type1)
+                         (null (cdr type1))))
+                (find-class t1 nil env))
+           (multiple-value-bind (subtypep knownp)
+               (cl:subtypep t1 ',base-type env)
+             (values subtypep knownp))
+           (call-next-method)))
+
      (defmethod %upgraded-cl-type ((name (eql ',type)) type &optional env)
        (destructuring-bind (&optional (element-type 'cl:* elt-supplied-p) (rank 'cl:* rankp))
            (rest (alexandria:ensure-list type))
@@ -93,7 +154,7 @@ Example, see DENSE-ARRAYS:ARRAY."
                  (elt-supplied-p
                   `(and ,',base-type
                         (satisfies ,(element-type-p-fn-name element-type))))
-                 (rankp                   ; never invoked though
+                 (rankp                 ; never invoked though
                   `(and ,',base-type
                         (satisfies ,(rank-p-fn-name rank))))
                  (t
@@ -129,7 +190,42 @@ Example, see DENSE-ARRAYS:ARRAY."
                      ((type= (second type1) (second type2))
                       (values dim-subtype-p t))
                      (t
-                      (values nil t))))))))))
+                      (values nil t))))))))
+
+     (defmethod %intersect-type-p
+         ((t1 (eql ',type)) (t2 (eql ',type)) type1 type2 &optional env)
+       (declare (ignore t1 t2))
+       (destructuring-bind (&optional (elt1 'cl:*) (dr1 'cl:*))
+           (rest (alexandria:ensure-list type1))
+         (destructuring-bind (&optional (elt2 'cl:*) (dr2 'cl:*))
+             (rest (alexandria:ensure-list type2))
+           (let ((dim-rank-intersect-p (or (and (eq 'cl:* dr1)
+                                                (eq 'cl:* dr2))
+                                           (eq 'cl:* dr1)
+                                           (eq 'cl:* dr2)
+                                           (and (numberp dr1)
+                                                (numberp dr2)
+                                                (= dr1 dr2))
+                                           (and (numberp dr1)
+                                                (= dr1 (length dr2)))
+                                           (and (numberp dr2)
+                                                (= dr2 (length dr1)))
+                                           (and (= (length dr1) (length dr2))
+                                                (loop :for d1 :in dr1
+                                                      :for d2 :in dr2
+                                                      :always (or (eq 'cl:* d1)
+                                                                  (eq 'cl:* d2)
+                                                                  (= d1 d2)))))))
+             (cond ((and (eq 'cl:* elt1)
+                         (eq 'cl:* elt2))
+                    (values dim-rank-intersect-p t))
+                   ((or (eq 'cl:* elt1)
+                        (eq 'cl:* elt2))
+                    (values dim-rank-intersect-p t))
+                   (t
+                    (values (and (type= elt1 elt2 env)
+                                 dim-rank-intersect-p)
+                            t)))))))))
 
 (defun array-type-element-type (array-type &optional env)
   "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-ELEMENT-TYPE; returns the
