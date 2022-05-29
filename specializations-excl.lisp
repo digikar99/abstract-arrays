@@ -240,12 +240,10 @@ See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
             "Expected ARRAY-TYPE to be a SUBTYPE of ABSTRACT-ARRAYS:ABSTRACT-ARRAY but is~%  ~S"
             array-type)
     (optima:match array-type
-      ((symbol _)
-       'cl:*)
-      ((list _)
-       'cl:*)
       ((list* _ element-type _)
-       element-type))))
+       element-type)
+      ((variable _)
+       'cl:*))))
 
 (defun array-type-rank (array-type &optional env)
   "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-RANK; returns the actual RANK
@@ -258,17 +256,15 @@ See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
             "Expected ARRAY-TYPE to be a SUBTYPE of ABSTRACT-ARRAYS:ABSTRACT-ARRAY but is~%  ~S"
             array-type)
     (optima:match array-type
-      ((symbol _)
-       'cl:*)
-      ((list _)
-       'cl:*)
       ((list _ _)
        'cl:*)
       ((list _ _ rank/dimensions)
        (typecase rank/dimensions
          (list (length rank/dimensions))
          (number rank/dimensions)
-         (t 'cl:*))))))
+         (t 'cl:*)))
+      ((variable _)
+       'cl:*))))
 
 (defun array-type-dimensions (array-type &optional env)
   "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-DIMENSIONS; returns the actual DIMENSIONS

@@ -6,6 +6,7 @@
   :depends-on ("polymorphic-functions"
                "alexandria"
                (:feature :extensible-compound-types "extensible-compound-types-cl")
+               (:feature :extensible-compound-types "optima")
                "closer-mop"
                "introspect-environment")
   :serial t
