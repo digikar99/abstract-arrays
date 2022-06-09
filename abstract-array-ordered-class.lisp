@@ -114,9 +114,8 @@
    slots))
 
 (defun generate-ordered-class-options (order options)
-  `((:metaclass abstract-array-class)
-    (:order ,@order)
-    ,@(remove-if (lambda (x) (member x '(:metaclass :order))) options :key #'car)))
+  `((:order ,@order)
+    ,@(remove-if (lambda (x) (member x '(:order))) options :key #'car)))
 
 (defmacro define-ordered-class (name super-classes &body (slots . options))
   (let ((order (cadr (find :order options :key #'car))))

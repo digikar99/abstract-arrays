@@ -60,6 +60,7 @@ This is substituted with a error-ing :initform."
                  :polymorph t :reader array-rank)
    (total-size   :required t :type (integer 0 #.array-total-size-limit)
                  :polymorph t :reader array-total-size))
+  (:metaclass abstract-array-class)
   (:order #.+abstract-array-slot-order+))
 
 (setf (documentation 'abstract-array-dimensions 'function)

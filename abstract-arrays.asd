@@ -15,7 +15,6 @@
                (:file "abstract-array-ordered-class")
                (:file "abstract-array")
                (:file "remaining-protocol")
-               #-extensible-compound-types
-               (:file "specializations-cl")
-               #+extensible-compound-types
-               (:file "specializations-excl")))
+               (:file "specializations-cl" :if-feature (:not :extensible-compound-types))
+               (:file "specializations-excl" :if-feature :extensible-compound-types)
+               (:file "lisp-polymorph" :if-feature :polymorphic-cl)))
