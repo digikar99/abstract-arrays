@@ -1,0 +1,42 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: ${{ matrix.lisp }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        lisp: [sbcl]
+        os: [ubuntu-latest]
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Update $PATH
+      run: |
+        echo $PATH
+        echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+    - name: Check $PATH
+      run: echo $PATH
+
+    - name: Download implementation
+      env:
+        LISP: ${{ matrix.lisp }}
+      run: |
+          pwd
+          ls -l
+          bash <(curl -s https://raw.githubusercontent.com/digikar99/lisp-travis-lite/master/run.sh)
+
+    - name: Move system to quicklisp/local-projects
+      run: |
+        mkdir -p ~/quicklisp/local-projects/abstract-arrays
+        mv * ~/quicklisp/local-projects/abstract-arrays
+
+    - name: Compile System
+      run: cl --eval '(ql:quickload "abstract-arrays")'
+
+    - name: Load System
+      run: cl --eval '(asdf:load-system "abstract-arrays")'
