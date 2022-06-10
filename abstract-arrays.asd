@@ -17,5 +17,4 @@
                (:file "abstract-array")
                (:file "remaining-protocol")
                (:file "specializations-cl" :if-feature (:not :extensible-compound-types))
-               (:file "specializations-excl" :if-feature :extensible-compound-types)
-               (:file "lisp-polymorph" :if-feature :polymorphic-cl)))
+               (:file "specializations-excl" :if-feature :extensible-compound-types)))
