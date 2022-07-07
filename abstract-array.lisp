@@ -69,9 +69,15 @@ this list would result in a change in the DIMENSIONS of the array; hence use
 this only for read-only access to the DIMENSIONS.")
 
 ;; FIXME: This does not work with displaced arrays
-(defpolymorph array-storage ((array cl:array)) cl:vector
-  (declare (ignorable array))
-  #+sbcl (sb-ext:array-storage-vector array)
+(defpolymorph (array-storage :inline t) ((array cl:array)) cl:vector
+  (declare (ignorable array)
+           (optimize speed))
+  #+sbcl (loop :with array := array
+               :if (typep array 'cl:simple-array)
+                 :do (locally (declare (type (cl:simple-array * (*)) array))
+                       (return (sb-ext:array-storage-vector array)))
+               :else
+                 :do (setq array (cl:array-displacement array)))
   #-sbcl (error "ARRAY-STORAGE not implemented for CL:ARRAY!"))
 
 #+sbcl
