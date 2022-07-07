@@ -142,6 +142,7 @@ Example, see DENSE-ARRAYS:ARRAY."
            (call-next-method)))
 
      (defmethod %upgraded-cl-type ((name (eql ',type)) type &optional env)
+       (declare (ignore env))
        (destructuring-bind (&optional (element-type 'cl:* elt-supplied-p) (rank 'cl:* rankp))
            (rest (alexandria:ensure-list type))
          (when (listp rank) (setq rank (length rank)))
@@ -161,7 +162,7 @@ Example, see DENSE-ARRAYS:ARRAY."
                   ',base-type)))))
 
      (defmethod %subtypep ((t1 (eql ',type)) (t2 (eql ',type)) type1 type2 &optional env)
-       (declare (ignore t1 t2 env))
+       (declare (ignore t1 t2))
        (subtypep `(cl:array ,@(rest (alexandria:ensure-list type1)))
                  `(cl:array ,@(rest (alexandria:ensure-list type2)))
                  env))
