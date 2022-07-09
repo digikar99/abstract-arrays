@@ -74,7 +74,7 @@ this only for read-only access to the DIMENSIONS.")
            (optimize speed))
   #+sbcl (loop :with array := array
                :if (typep array 'cl:simple-array)
-                 :do (locally (declare (type (cl:simple-array * (*)) array))
+                 :do (locally (declare (type (cl:simple-array *) array))
                        (return (sb-ext:array-storage-vector array)))
                :else
                  :do (setq array (cl:array-displacement array)))
