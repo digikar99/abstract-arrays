@@ -52,9 +52,20 @@
                        (array-rank (the abstract-array object)))))))))
 
 (defmacro define-array-specialization-type (type &optional (base-type 'abstract-array))
-    "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
-using SATISFIES type. For an example, see DENSE-ARRAYS:ARRAY"
+  "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
+using SATISFIES type.
+
+Additionally, defines POLYMORPHIC-FUNCTIONS:PARAMETRIC-TYPE-RUN-TIME-LAMBDA-BODY
+and POLYMORPHIC-FUNCTIONS:PARAMETRIC-TYPE-COMPILE-TIME-LAMBDA-BODY corresponding
+to TYPE.
+
+BASE-TYPE should be the name of the CLASS upon which the arrays will be based.
+
+See DENSE-ARRAYS:ARRAY for an example."
   `(progn
+
+     (define-methods-for-parametric-type-lambda-bodies ,type)
+
      (deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
        (when (listp rank) (setq rank (length rank)))
        (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))

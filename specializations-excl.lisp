@@ -56,11 +56,16 @@
 using EXTENSIBLE-COMPOUND-TYPES:DEFINE-COMPOUND-TYPE.
 
 Also defines a CL alias using SATISFIES type.
+Additionally, defines POLYMORPHIC-FUNCTIONS:PARAMETRIC-TYPE-RUN-TIME-LAMBDA-BODY
+and POLYMORPHIC-FUNCTIONS:PARAMETRIC-TYPE-COMPILE-TIME-LAMBDA-BODY corresponding
+to TYPE.
 
 BASE-TYPE should be the name of the CLASS upon which the arrays will be based.
 
-Example, see DENSE-ARRAYS:ARRAY."
+See DENSE-ARRAYS:ARRAY for an example."
   `(progn
+
+     (define-methods-for-parametric-type-lambda-bodies ,type)
 
      (define-compound-type ,type (o
                                   &optional (element-type 'cl:*)

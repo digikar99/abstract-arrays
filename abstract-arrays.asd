@@ -16,5 +16,6 @@
                (:file "abstract-array-ordered-class")
                (:file "abstract-array")
                (:file "remaining-protocol")
+               (:file "parametric-types")
                (:file "specializations-cl" :if-feature (:not :extensible-compound-types))
                (:file "specializations-excl" :if-feature :extensible-compound-types)))
