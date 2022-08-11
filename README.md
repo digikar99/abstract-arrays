@@ -45,7 +45,7 @@ The slot-readers and array-operators are implemented using [polymorphic-function
 
 The compile time facilities allows one to define array specialization types using `deftype` that specialize on element-type and rank - without a corresponding explosion in the number of predicates. The specialization is done using a systematic arrangement of predicates that check for element-type or rank. These should also obey `subtypep` due to their arrangement.
 
-The system also wraps around the CL symbols with the same names. Thus, for example, `abstract-arrays:array-dimensions` when compiled with appropriate type declarations is as efficient as `cl:array-dimensions`.
+The system also wraps around the CL symbols with the same names. Thus, for example, `abstract-arrays:array-dimensions` when compiled with appropriate type declarations is as efficient as `cl:array-dimensions`. More documentation lives inside docstrings.
 
 ## Installation
 
