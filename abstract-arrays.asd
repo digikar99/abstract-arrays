@@ -1,7 +1,7 @@
 
 (defsystem "abstract-arrays"
   :author "Shubhamkar B. Ayare (shubhamayare@yahoo.co.in)"
-  :version "0.1.3"
+  :version "0.2.0"
   :description "Julia's AbstractArray like abstraction for Common Lisp."
   :licence "MIT"
   :depends-on ("polymorphic-functions"

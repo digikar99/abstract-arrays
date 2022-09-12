@@ -1,8 +1,18 @@
 (in-package :abstract-arrays)
 
+(defpolymorph narray-dimensions ((array abstract-array)) list
+  "Returns the dimensions of the ARRAY. The consequences are undefined if the
+returned dimensions are modified. Use ARRAY-DIMENSIONS if destructive usage of
+the returned list is intended."
+  (abstract-array-dimensions array))
+
 ;;; Redefine and copy-list, because, we don't want users
 ;;; to assume destructive modification is okay
 (defpolymorph array-dimensions ((array abstract-array)) list
+  "Returns a COPY of the dimensions of ARRAY. The copy may then be modified.
+
+See NARRAY-DIMENSIONS or equivalent of a copy is to be avoided, and destructive
+use is not intended."
   (copy-list (abstract-array-dimensions array)))
 
 (declaim (inline array-dimension))

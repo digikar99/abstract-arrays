@@ -15,6 +15,7 @@
     #:array-storage-set
 
     #:array-dimensions
+    #:narray-dimensions
     #:abstract-array-dimensions
     #:array-dimension
     #:array-rank
