@@ -26,8 +26,14 @@ use is not intended."
 
 
 ;; FIXME: SBCL doesn't call the compiler-macro on APPLY, does anyone do it?
-(define-polymorphic-function aref (array &rest subscripts) :overwrite t)
+(define-polymorphic-function aref (array &rest subscripts) :overwrite t
+  :documentation "This is SETF-able.")
 (defpolymorph aref ((array cl:array) &rest subscripts) t
+  #.(concatenate 'string
+                 "A wrapper around CL:AREF."
+                 (string #\newline)
+                 (string #\newline)
+                 (documentation 'cl:aref 'cl:function))
   (declare (dynamic-extent subscripts))
   (apply #'cl:aref array subscripts))
 

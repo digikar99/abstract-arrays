@@ -70,6 +70,10 @@ See DENSE-ARRAYS:ARRAY for an example."
      (define-compound-type ,type (o
                                   &optional (element-type 'cl:*)
                                   (dim/rank 'cl:*))
+       ,(format nil
+                "A wrapper around ~S with support for specifying ELEMENT-TYPE and DIMENSIONS or RANK.
+These specializers are the same like the CL:ARRAY compound type."
+                base-type)
        (and (cl:typep o ',base-type)
             (locally (declare (type ,base-type o))
               (or (eq 'cl:* element-type)
