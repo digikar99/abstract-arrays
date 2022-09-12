@@ -88,7 +88,7 @@ this only for read-only access to the DIMENSIONS.")
   (setf (slot-value instance slot-name)
         (mapcar #'find-class '(abstract-array t))))
 
-(defmacro define-array-class (name &body (direct-slots . slot-options))
+(defmacro define-array-class (name &body (direct-slots &rest slot-options))
   "Defines NAME as a CLASS with DIRECT-SUPERCLASS ABSTRACT-ARRAY and metaclass
 as ABSTRACT-ARRAY-CLASS. Also defines the appropriate order using DIRECT-SLOTS."
   `(define-ordered-class-with-required-slots ,name (abstract-array)

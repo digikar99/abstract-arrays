@@ -117,7 +117,7 @@
   `((:order ,@order)
     ,@(remove-if (lambda (x) (member x '(:order))) options :key #'car)))
 
-(defmacro define-ordered-class (name super-classes &body (slots . options))
+(defmacro define-ordered-class (name super-classes &body (slots &rest options))
   (let ((order (cadr (find :order options :key #'car))))
     `(progn
        (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -125,5 +125,3 @@
            ,(generate-ordered-class-slot-specifiers slots order)
            ,@(generate-ordered-class-options order options)))
        ,@(generate-ordered-class-fast-accessors name slots order))))
-
-
