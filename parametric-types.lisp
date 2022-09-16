@@ -24,6 +24,7 @@
      (optima:match type
        ((optima:guard (list* ft-type-car _)
                       (and ft-type-car
+                           (type-specifier-p ft-type-car)
                            (subtypep ft-type-car ',type-car)))
         ,(optima:match type-cdr
            ((list* (eql parameter) _)
