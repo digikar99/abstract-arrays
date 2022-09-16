@@ -14,13 +14,21 @@
             ((optima:guard (list _ dimensions)
                            (position parameter dimensions))
              `(array-dimension array ,(position parameter dimensions)))
-            (otherwise
+            (_
              (error "TYPE-PARAMETER ~S not in PARAMETRIC-TYPE ~S"
                     parameter (cons type-car type-cdr))))))))
 
 (defun parametric-type-compile-time-lambda-body-for-arrays (type-car type-cdr parameter)
   `(cl:lambda (type)
      (declare (ignorable type))
+     #+extensible-compound-types
+     (setq type (optima:match type
+                  ((list* 'or _)
+                   (extensible-compound-types.impl::simplify-or-type type))
+                  ((list* 'and _)
+                   (extensible-compound-types.impl::simplify-and-type type))
+                  (_
+                   type)))
      (optima:match type
        ((optima:guard (list* ft-type-car _)
                       (and ft-type-car
@@ -44,10 +52,10 @@
                  (if (eq dimension 'cl:*)
                      nil
                      dimension))))
-           (otherwise
+           (_
             (error "TYPE-PARAMETER ~S not in PARAMETRIC-TYPE ~S"
                    parameter (cons type-car type-cdr)))))
-       (otherwise nil))))
+       (_ nil))))
 
 (defmacro define-methods-for-parametric-type-lambda-bodies (type)
   `(progn
