@@ -9,7 +9,8 @@
                (:feature :extensible-compound-types "extensible-compound-types-cl")
                (:feature :extensible-compound-types "optima")
                "closer-mop"
-               "introspect-environment")
+               "introspect-environment"
+               "trivial-types")
   :serial t
   :components ((:file "pre-package")
                (:file "package")
