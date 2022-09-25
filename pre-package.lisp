@@ -31,4 +31,6 @@
     #:define-array-specialization-type
     #:array-type-element-type
     #:array-type-rank
-    #:array-type-dimensions))
+    #:array-type-dimensions
+
+    #:*array-class-type-alist*))
