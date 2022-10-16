@@ -25,6 +25,8 @@
 
     #:aref
     #:row-major-aref
+    #:col-major-aref
+    #:column-major-aref
 
     #:define-array-class
     #:define-array-specializations

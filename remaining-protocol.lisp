@@ -45,7 +45,7 @@ use is not intended."
 (define-polymorphic-function row-major-aref (array index) :overwrite t
   :documentation
   "Return the element of ARRAY corresponding to the row-major INDEX.
-This is SETFable")
+This is SETFable.")
 (defpolymorph row-major-aref ((array cl:array) index) t
   (cl:row-major-aref array index))
 
@@ -53,6 +53,49 @@ This is SETFable")
 (defpolymorph (setf row-major-aref) (new (array cl:array) index) t
   (setf (cl:row-major-aref array index) new))
 
+(define-polymorphic-function col-major-aref (array index) :overwrite t
+  :documentation "Return the element of ARRAY corresponding to the column-major INDEX.
+This is SETFable.")
+(defpolymorph col-major-aref ((array cl:array) index) t
+  (let ((col-major-index
+          (loop :for d :in (cl:array-dimensions array)
+                :with s := 1
+                :with col-major-index := 0
+                :do (incf col-major-index (* s (floor index s)))
+                    (setf index (rem index s))
+                    (setf s (* s d))
+                :finally (return col-major-index)))
+        (initial-offset (nth-value 1 (cl:array-displacement array))))
+    (cl:aref (array-storage array)
+             (+ initial-offset col-major-index))))
+;; TODO: Implement a compiler-macro for this
+
+(define-polymorphic-function (setf col-major-aref) (new array index) :overwrite t)
+(defpolymorph (setf col-major-aref) (new (array cl:array) index) t
+  (let ((col-major-index
+          (loop :for d :in (cl:array-dimensions array)
+                :with s := 1
+                :with col-major-index := 0
+                :do (incf col-major-index (* s (floor index s)))
+                    (setf index (rem index s))
+                    (setf s (* s d))
+                :finally (return col-major-index)))
+        (initial-offset (nth-value 1 (cl:array-displacement array))))
+    (setf (cl:aref (array-storage array)
+                   (+ initial-offset col-major-index))
+          new)))
+
+(declaim (inline column-major-aref (setf column-major-aref)))
+(defun column-major-aref (array index)
+  "Return the element of ARRAY corresponding to the column-major INDEX.
+This is SETFable, and a wrapper around COL-MAJOR-AREF."
+  (col-major-aref array index))
+(define-compiler-macro column-major-aref (array-form index-form)
+  `(col-major-aref ,array-form ,index-form))
+(defun (setf column-major-aref) (new array index)
+  (funcall #'(setf col-major-aref) new array index))
+(define-compiler-macro (setf column-major-aref) (array-form index-form)
+  `(funcall #'(setf col-major-aref) ,array-form ,index-form))
 
 ;;; TODO: Implement these for CLHS arrays
 ;;; FIXME: This isn't the fastest way of ref-ing. See dense-arrays backends.
