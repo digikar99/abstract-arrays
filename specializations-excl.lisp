@@ -156,6 +156,8 @@ These specializers are the same like the CL:ARRAY compound type."
            (rest (alexandria:ensure-list type))
          (when (listp rank) (setq rank (length rank)))
          (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
+         (when (eq '* element-type) (setq elt-supplied-p nil))
+         (when (eq '* rank)         (setq rankp nil))
          (let ((*package* (find-package :abstract-arrays)))
            (cond ((and rankp elt-supplied-p)
                   `(and ,',base-type
@@ -267,6 +269,5 @@ The predicates of the two kinds will be independent of each other."
      nil
      bit
      fixnum
-     t
-     cl:*)
-    #.(cons 'cl:* (loop :for i :below 8 :collect i)))
+     t)
+    #.(loop :for i :below 8 :collect i))
