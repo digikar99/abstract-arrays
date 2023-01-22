@@ -64,9 +64,7 @@ BASE-TYPE should be the name of the CLASS upon which the arrays will be based.
 See DENSE-ARRAYS:ARRAY for an example."
   `(progn
 
-     (define-methods-for-parametric-type-lambda-bodies ,type)
-
-     (deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
+     (cl:deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
        (when (listp rank) (setq rank (length rank)))
        (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
        (when (eq '* element-type) (setq elt-supplied-p nil))

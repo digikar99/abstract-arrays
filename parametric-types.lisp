@@ -12,16 +12,18 @@ a symbol to be used as the CAR of the type-specifier.
 See dense-arrays/src/types.lisp for an instance of such a function.")
 
 (polymorphic-functions:defpolymorph polymorphic-functions:specializing-type-of
-    ((object abstract-arrays:abstract-array)) (or symbol (cons symbol t))
+    ((object abstract-arrays:abstract-array))
+    (or symbol cons)
   (let* ((class      (class-of object))
          (class-name (class-name class))
          (type-or-function (or (alexandria:assoc-value *array-class-type-alist* class-name)
                                (alexandria:assoc-value *array-class-type-alist* class))))
     (etypecase type-or-function
       (function (list (funcall type-or-function object)
-                      (array-element-type object)))
+                      (array-element-type object)
+                      (array-rank object)))
       (null class-name)
-      (symbol (list type-or-function (array-element-type object))))))
+      (symbol (list type-or-function (array-element-type object) (array-rank object))))))
 
 (defun atom-like-p (atom-or-list)
   (or (atom atom-or-list)
