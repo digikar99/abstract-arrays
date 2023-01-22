@@ -47,7 +47,7 @@ This is substituted with a error-ing :initform."
       '(storage dimensions element-type rank total-size)
     :test #'equal))
 
-(define-ordered-class-with-required-slots abstract-array ()
+(define-ordered-class-with-required-slots abstract-array (t)
   ((storage      :required t
                  :polymorph t :reader array-storage)
    ;; This list is not expected to be modified; therefore, we do a bit unusual thing
