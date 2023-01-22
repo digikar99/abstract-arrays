@@ -80,14 +80,6 @@ this only for read-only access to the DIMENSIONS.")
                        (t (setq array (cl:array-displacement array))))))
   #-sbcl (error "ARRAY-STORAGE not implemented for CL:ARRAY!"))
 
-#+sbcl
-(defmethod slot-unbound (class
-                         (instance abstract-array-class)
-                         (slot-name (eql 'sb-pcl::%class-precedence-list)))
-  ;; FIXME: Is this correct?
-  (setf (slot-value instance slot-name)
-        (mapcar #'find-class '(abstract-array t))))
-
 (defmacro define-array-class (name &body (direct-slots &rest slot-options))
   "Defines NAME as a CLASS with DIRECT-SUPERCLASS ABSTRACT-ARRAY and metaclass
 as ABSTRACT-ARRAY-CLASS. Also defines the appropriate order using DIRECT-SLOTS."
