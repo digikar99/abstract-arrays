@@ -63,6 +63,11 @@ This is substituted with a error-ing :initform."
   (:metaclass abstract-array-class)
   (:order #.+abstract-array-slot-order+))
 
+#+ccl
+(defmethod initialize-instance ((instance abstract-array)
+                                &rest initargs &key &allow-other-keys)
+  (ccl::%shared-initialize instance t initargs))
+
 (setf (documentation 'abstract-array-dimensions 'function)
       "Access the DIMENSIONS list of the ABSTRACT-ARRAY. Destructively modifying
 this list would result in a change in the DIMENSIONS of the array; hence use
