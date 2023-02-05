@@ -31,54 +31,37 @@ See dense-arrays/src/types.lisp for an instance of such a function.")
            (first atom-or-list)
            (null (rest atom-or-list)))))
 
-(defun parametric-type-run-time-lambda-body-for-arrays (type-car type-cdr parameter)
-  `(cl:lambda (array)
-     (declare (compiler-macro-notes:muffle
-               compiler-macro-notes:optimization-failure-note))
-     (when (typep array ',type-car)
-       (locally (declare (type ,type-car array))
+(defun parametric-type-compile-time-lambda-body-for-arrays (type-car type-cdr parameter)
+  `(cl:lambda (type)
+     (declare (ignorable type))
+     (handler-case
+         (orthogonally-specializing-type-compile-time-lambda-body
+          ',type-car ',type-cdr ',parameter type)
+       (compiler-macro-notes:optimization-failure-note ()
          ,(optima:match type-cdr
             ((list* (eql parameter) _)
-             `(array-element-type array))
+             `(let ((elt-type (array-type-element-type type)))
+                (if (eq elt-type 'cl:*)
+                    nil
+                    (values elt-type t))))
             ((list _ (eql parameter))
-             `(array-rank array))
+             `(let ((rank (array-type-rank type)))
+                (if (eq rank 'cl:*)
+                    nil
+                    (values rank t))))
             ((optima:guard (list _ dimensions)
                            (position parameter dimensions))
-             `(array-dimension array ,(position parameter dimensions)))
+             (let ((pos (position parameter dimensions)))
+               `(let ((dimension (nth ,pos (array-type-dimensions type))))
+                  (if (eq dimension 'cl:*)
+                      nil
+                      (values dimension t)))))
             (_
              (error "TYPE-PARAMETER ~S not in PARAMETRIC-TYPE ~S"
                     parameter (cons type-car type-cdr))))))))
 
-(defun parametric-type-compile-time-lambda-body-for-arrays (type-car type-cdr parameter)
-  `(cl:lambda (type)
-     (declare (ignorable type))
-     ,(optima:match type-cdr
-        ((list* (eql parameter) _)
-         `(let ((elt-type (array-type-element-type type)))
-            (if (eq elt-type 'cl:*)
-                nil
-                (values elt-type t))))
-        ((list _ (eql parameter))
-         `(let ((rank (array-type-rank type)))
-            (if (eq rank 'cl:*)
-                nil
-                (values rank t))))
-        ((optima:guard (list _ dimensions)
-                       (position parameter dimensions))
-         (let ((pos (position parameter dimensions)))
-           `(let ((dimension (nth ,pos (array-type-dimensions type))))
-              (if (eq dimension 'cl:*)
-                  nil
-                  (values dimension t)))))
-        (_
-         (error "TYPE-PARAMETER ~S not in PARAMETRIC-TYPE ~S"
-                parameter (cons type-car type-cdr))))))
-
 (defmacro define-methods-for-parametric-type-lambda-bodies (type)
   `(progn
-     (defmethod polymorphic-functions:parametric-type-run-time-lambda-body
-         ((type-car (eql ',type)) type-cdr parameter)
-       (parametric-type-run-time-lambda-body-for-arrays type-car type-cdr parameter))
      (defmethod polymorphic-functions:parametric-type-compile-time-lambda-body
          ((type-car (eql ',type)) type-cdr parameter)
        (parametric-type-compile-time-lambda-body-for-arrays type-car type-cdr parameter))))

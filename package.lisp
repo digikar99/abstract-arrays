@@ -5,6 +5,8 @@
   #-extensible-compound-types
   (:use :cl)
   (:shadowing-import-exported-symbols :polymorphic-functions)
+  (:import-from :polymorphic-functions
+                #:orthogonally-specializing-type-compile-time-lambda-body)
   #-extensible-compound-types
   (:import-from :trivial-types #:type-specifier-p)
   #.(cons :shadow (export-symbols))
