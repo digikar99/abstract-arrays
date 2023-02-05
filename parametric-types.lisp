@@ -57,19 +57,19 @@ See dense-arrays/src/types.lisp for an instance of such a function.")
          `(let ((elt-type (array-type-element-type type)))
             (if (eq elt-type 'cl:*)
                 nil
-                elt-type)))
+                (values elt-type t))))
         ((list _ (eql parameter))
          `(let ((rank (array-type-rank type)))
             (if (eq rank 'cl:*)
                 nil
-                rank)))
+                (values rank t))))
         ((optima:guard (list _ dimensions)
                        (position parameter dimensions))
          (let ((pos (position parameter dimensions)))
            `(let ((dimension (nth ,pos (array-type-dimensions type))))
               (if (eq dimension 'cl:*)
                   nil
-                  dimension))))
+                  (values dimension t)))))
         (_
          (error "TYPE-PARAMETER ~S not in PARAMETRIC-TYPE ~S"
                 parameter (cons type-car type-cdr))))))
