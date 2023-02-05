@@ -84,21 +84,24 @@ See DENSE-ARRAYS:ARRAY for an example."
                       (satisfies ,(rank-p-fn-name rank))))
                (t
                 ',base-type))))
-     (let ((gensym (gensym (concatenate 'string (symbol-name ',type)
-                                        "-SUBTYPE-P"))))
-       ;; FIXME: This isn't the nicest way to do this!
-       (compile gensym (lambda (type1 type2 &optional env)
-                         (declare (ignore env))
-                         (cond ((not (and (polymorphic-functions.extended-types:subtypep type1 ',base-type)
-                                          (polymorphic-functions.extended-types:subtypep type2 ',base-type)))
-                                (values nil nil))
-                               ((polymorphic-functions.extended-types:type= type1 type2)
-                                (values t t))
-                               ((member type2 '(nil t) :test #'polymorphic-functions.extended-types:type=)
-                                (values t t))
-                               (t
-                                (values nil t)))))
-       (push gensym polymorphic-functions.extended-types:*extended-subtypep-functions*))))
+     ,(let ((gensym (gensym (concatenate 'string (symbol-name type)
+                                         "-SUBTYPE-P"))))
+        `(flet ((,gensym (type1 type2 &optional env)
+                  (declare (ignore env))
+                  (cond ((not (and (polymorphic-functions.extended-types:subtypep
+                                    type1 ',base-type)
+                                   (polymorphic-functions.extended-types:subtypep
+                                    type2 ',base-type)))
+                         (values nil nil))
+                        ((polymorphic-functions.extended-types:type= type1 type2)
+                         (values t t))
+                        ((member type2 '(nil t)
+                                 :test #'polymorphic-functions.extended-types:type=)
+                         (values t t))
+                        (t
+                         (values nil t)))))
+           (push (cl:function ,gensym)
+                 polymorphic-functions.extended-types:*extended-subtypep-functions*)))))
 
 (defun array-type-element-type (array-type &optional env)
     "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-ELEMENT-TYPE; returns the
