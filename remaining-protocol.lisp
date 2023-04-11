@@ -1,5 +1,7 @@
 (in-package :abstract-arrays)
 
+(define-polymorphic-function narray-dimensions (array))
+(declaim (cl:ftype (function * list) narray-dimensions))
 (defpolymorph narray-dimensions ((array abstract-array)) list
   "Returns the dimensions of the ARRAY. The consequences are undefined if the
 returned dimensions are modified. Use ARRAY-DIMENSIONS if destructive usage of
@@ -27,7 +29,8 @@ use is not intended."
 
 ;; FIXME: SBCL doesn't call the compiler-macro on APPLY, does anyone do it?
 (define-polymorphic-function aref (array &rest subscripts) :overwrite t
-  :documentation "This is SETF-able.")
+  :documentation "This is SETF-able."
+  :dispatch-declaration '(optimize speed))
 (defpolymorph aref ((array cl:array) &rest subscripts) t
   #.(concatenate 'string
                  "A wrapper around CL:AREF."
