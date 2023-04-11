@@ -35,4 +35,6 @@
     #:array-type-rank
     #:array-type-dimensions
 
-    #:*array-class-type-alist*))
+    #:*array-class-type-alist*
+
+    #:invalid-array-index))
