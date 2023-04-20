@@ -5,6 +5,7 @@
   :licence "MIT"
   :depends-on ("polymorphic-functions"
                "alexandria"
+               "extensible-compound-types"
                (:feature :extensible-compound-types "extensible-compound-types-cl")
                (:feature :extensible-compound-types "optima")
                "closer-mop"
