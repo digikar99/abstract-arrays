@@ -160,7 +160,9 @@ The predicates of the two kinds will be independent of each other."
 
 ;; Some preprovided specializations
 (define-array-specializations
-    (single-float
+    ((complex single-float)
+     (complex double-float)
+     single-float
      double-float
      (unsigned-byte 64)
      (unsigned-byte 32)
