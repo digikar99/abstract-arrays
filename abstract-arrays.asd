@@ -1,15 +1,14 @@
 (defsystem "abstract-arrays"
   :author "Shubhamkar B. Ayare (shubhamayare@yahoo.co.in)"
-  :version "0.2.4"
+  :version "0.3.0"
   :description "Julia's AbstractArray like abstraction for Common Lisp."
   :licence "MIT"
-  :depends-on ("polymorphic-functions"
-               "alexandria"
-               "extensible-compound-types"
-               (:feature :extensible-compound-types "extensible-compound-types-cl")
-               (:feature :extensible-compound-types "optima")
+  :depends-on ("alexandria"
                "closer-mop"
+               "compiler-macro-notes"
                "introspect-environment"
+               "optima"
+               "peltadot"
                "trivial-types")
   :serial t
   :components ((:file "pre-package")
@@ -17,6 +16,6 @@
                (:file "abstract-array-ordered-class")
                (:file "abstract-array")
                (:file "remaining-protocol")
-               (:file "parametric-types")
                (:file "specializations")
+               (:file "parametric-types")
                (:file "conditions")))

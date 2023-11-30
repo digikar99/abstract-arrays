@@ -1,2 +1,1 @@
-("polymorphic-functions" :git "https://github.com/digikar99/polymorphic-functions")
-("extensible-compound-types" :git "https://github.com/digikar99/extensible-compound-types")
+("peltadot" :git "https://gitlab.com/digikar/peltadot")

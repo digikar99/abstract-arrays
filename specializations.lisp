@@ -55,53 +55,27 @@
   "Defines a (TYPE &OPTIONAL ELEMENT-TYPE RANK) type for each RANK and ELEMENT-TYPE
 using SATISFIES type.
 
-Additionally, defines POLYMORPHIC-FUNCTIONS:PARAMETRIC-TYPE-RUN-TIME-LAMBDA-BODY
-and POLYMORPHIC-FUNCTIONS:PARAMETRIC-TYPE-COMPILE-TIME-LAMBDA-BODY corresponding
-to TYPE.
-
 BASE-TYPE should be the name of the CLASS upon which the arrays will be based.
 
 See DENSE-ARRAYS:ARRAY for an example."
-  `(progn
-
-     (define-methods-for-parametric-type-lambda-bodies ,type)
-
-     (cl:deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
-       (when (listp rank) (setq rank (length rank)))
-       (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
-       (when (eq '* element-type) (setq elt-supplied-p nil))
-       (when (eq '* rank)         (setq rankp nil))
-       (let ((*package* (find-package :abstract-arrays)))
-         (cond ((and rankp elt-supplied-p)
-                `(and ,',base-type
-                      (satisfies ,(element-type-p-fn-name element-type))
-                      (satisfies ,(rank-p-fn-name rank))))
-               (elt-supplied-p
-                `(and ,',base-type
-                      (satisfies ,(element-type-p-fn-name element-type))))
-               (rankp                   ; never invoked though
-                `(and ,',base-type
-                      (satisfies ,(rank-p-fn-name rank))))
-               (t
-                ',base-type))))
-     ,(let ((gensym (gensym (concatenate 'string (symbol-name type)
-                                         "-SUBTYPE-P"))))
-        `(flet ((,gensym (type1 type2 &optional env)
-                  (declare (ignore env))
-                  (cond ((not (and (polymorphic-functions.extended-types:subtypep
-                                    type1 ',base-type)
-                                   (polymorphic-functions.extended-types:subtypep
-                                    type2 ',base-type)))
-                         (values nil nil))
-                        ((polymorphic-functions.extended-types:type= type1 type2)
-                         (values t t))
-                        ((member type2 '(nil t)
-                                 :test #'polymorphic-functions.extended-types:type=)
-                         (values t t))
-                        (t
-                         (values nil t)))))
-           (push (cl:function ,gensym)
-                 polymorphic-functions.extended-types:*extended-subtypep-functions*)))))
+  `(cl:deftype ,type (&optional (element-type '* elt-supplied-p) (rank '* rankp))
+     (when (listp rank) (setq rank (length rank)))
+     (check-type rank (or (eql *) (integer 0 #.array-rank-limit)))
+     (when (eq '* element-type) (setq elt-supplied-p nil))
+     (when (eq '* rank)         (setq rankp nil))
+     (let ((*package* (find-package :abstract-arrays)))
+       (cond ((and rankp elt-supplied-p)
+              `(and ,',base-type
+                    (satisfies ,(element-type-p-fn-name element-type))
+                    (satisfies ,(rank-p-fn-name rank))))
+             (elt-supplied-p
+              `(and ,',base-type
+                    (satisfies ,(element-type-p-fn-name element-type))))
+             (rankp                   ; never invoked though
+              `(and ,',base-type
+                    (satisfies ,(rank-p-fn-name rank))))
+             (t
+              ',base-type)))))
 
 (defun array-type-element-type (array-type &optional env)
     "Similar to SANDALPHON.COMPILER-MACRO:ARRAY-TYPE-ELEMENT-TYPE; returns the

@@ -1,15 +1,7 @@
 (cl:in-package #:abstract-arrays/defpackage)
-(polymorphic-functions.defpackage:defpackage :abstract-arrays
-  #+extensible-compound-types
-  (:use :extensible-compound-types-cl)
-  #-extensible-compound-types
-  (:use :cl)
-  (:shadowing-import-exported-symbols :polymorphic-functions)
-  (:import-from :polymorphic-functions
-                #:orthogonally-specializing-type-compile-time-lambda-body)
-  #-extensible-compound-types
-  (:import-from :trivial-types #:type-specifier-p)
+(peltadot/utils:defpackage :abstract-arrays
+  (:use #:peltadot)
   #.(cons :shadow (export-symbols))
-  #.(cons :export (export-symbols)))
-
-(in-package #:abstract-arrays)
+  #.(cons :export (export-symbols))
+  (:local-nicknames
+   (:polymorphic-functions #:peltadot/polymorphic-functions)))

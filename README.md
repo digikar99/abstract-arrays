@@ -41,7 +41,7 @@ This system/library provides an `abstract-array` package with:
   - array-storage-set
 
 
-The slot-readers and array-operators are implemented using [polymorphic-functions](https://github.com/digikar99/polymorphic-functions/) to allow for [more-or-less] portable inlining and installation of compiler-macros wherever appropriate. An attempt has also been made to optimize slot accesses using ordered-class discovered at [mfiano/zed](https://git.mfiano.net/mfiano/zed/src/branch/master/src/util-ordered-class.lisp).
+The slot-readers and array-operators are implemented using [polymorphic-functions](https://gitlab.com/digikar99/peltadot/) to allow for [more-or-less] portable inlining and installation of compiler-macros wherever appropriate. An attempt has also been made to optimize slot accesses using ordered-class discovered at [mfiano/zed](https://git.mfiano.net/mfiano/zed/src/branch/master/src/util-ordered-class.lisp).
 
 The compile time facilities allows one to define array specialization types using `deftype` that specialize on element-type and rank - without a corresponding explosion in the number of predicates. The specialization is done using a systematic arrangement of predicates that check for element-type or rank. These should also obey `subtypep` due to their arrangement.
 
@@ -49,7 +49,7 @@ The system also wraps around the CL symbols with the same names. Thus, for examp
 
 ## Installation
 
-Follow the instructions at https://github.com/digikar99/adhoc-polymorphic-functions/#getting-it-from-ultralisp
+TODO
 
 ## Usage
 
