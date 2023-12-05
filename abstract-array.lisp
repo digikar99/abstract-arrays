@@ -83,7 +83,15 @@ this only for read-only access to the DIMENSIONS.")
                        ((cl:simple-array * (*)) (return array))
                        (cl:simple-array (return (sb-ext:array-storage-vector array)))
                        (t (setq array (cl:array-displacement array))))))
-  #-sbcl (error "ARRAY-STORAGE not implemented for CL:ARRAY!"))
+  #+ccl (loop :with array := array
+               :do (typecase array
+                     ((cl:simple-array * (*)) (return array))
+                     (cl:simple-array
+                      (return (ccl::%array-header-data-and-offset array)))
+                     (t (setq array (cl:array-displacement array)))))
+  #-(or sbcl ccl)
+  (error "ARRAY-STORAGE not implemented for CL:ARRAY on ~A!"
+         (lisp-implementation-type)))
 
 (defmacro define-array-class (name &body (direct-slots &rest slot-options))
   "Defines NAME as a CLASS with DIRECT-SUPERCLASS ABSTRACT-ARRAY and metaclass
