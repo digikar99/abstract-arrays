@@ -33,7 +33,22 @@ jobs:
     - name: Move system to quicklisp/local-projects
       run: |
         mkdir -p ~/quicklisp/local-projects/abstract-arrays
+        ls -la
         mv * ~/quicklisp/local-projects/abstract-arrays
+        mv .dependencies ~/quicklisp/local-projects/abstract-arrays/
+        ls -la ~/quicklisp/local-projects/abstract-arrays
+
+    - name: Download download-dependencies
+      run: |
+        git clone https://github.com/digikar99/download-dependencies $HOME/quicklisp/local-projects/download-dependencies
+
+    - name: Download dependencies
+      run: |
+        cl --eval '(ql:quickload "download-dependencies")'\
+           --eval '(ql:register-local-projects)'\
+           --eval '(in-package :download-dependencies)'\
+           --eval '(let ((*dependencies-home* (first ql:*local-project-directories*))) (ensure-system "abstract-arrays"))'
+        ls -l ~/quicklisp/local-projects/
 
     - name: Compile System
       run: cl --eval '(ql:quickload "abstract-arrays")'
