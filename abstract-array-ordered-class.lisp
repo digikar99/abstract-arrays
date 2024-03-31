@@ -12,7 +12,7 @@
 (defmethod slot-unbound (class (array-class abstract-array-class)
                          (slot-name (eql 'sb-pcl::%class-precedence-list)))
   ;; FIXME: Is this correct?
-  (setf (slot-value instance slot-name)
+  (setf (slot-value class slot-name)
         (list array-class (find-class 't))))
 
 (defmethod closer-mop:validate-superclass
