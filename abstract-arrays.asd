@@ -1,11 +1,12 @@
 (defsystem "abstract-arrays"
   :author "Shubhamkar B. Ayare (shubhamayare@yahoo.co.in)"
-  :version "0.3.1"
+  :version "0.3.2"
   :description "Julia's AbstractArray like abstraction for Common Lisp."
   :licence "MIT"
   :depends-on ("alexandria"
                "closer-mop"
-               "peltadot")
+               "peltadot"
+               "peltadot-traits-library")
   :serial t
   :components ((:file "pre-package")
                (:file "package")

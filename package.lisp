@@ -4,4 +4,5 @@
   #.(cons :shadow (export-symbols))
   #.(cons :export (export-symbols))
   (:local-nicknames
-   (:polymorphic-functions #:peltadot/polymorphic-functions)))
+   (:polymorphic-functions #:peltadot/polymorphic-functions)
+   (:traits #:peltadot-traits-library)))
