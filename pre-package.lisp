@@ -7,8 +7,8 @@
 (in-package #:abstract-arrays/defpackage)
 
 (defun export-symbols ()
-  '(#:abstract-array
-    #:abstract-array-class
+  '(#:array
+    #:abstract-array
 
     #:array-storage
     #:array-storage-ref
@@ -28,7 +28,6 @@
     #:col-major-aref
     #:column-major-aref
 
-    #:define-array-class
     #:define-array-specializations
     #:define-array-specialization-type
     #:array-type-element-type

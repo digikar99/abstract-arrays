@@ -8,25 +8,6 @@ returned dimensions are modified. Use ARRAY-DIMENSIONS if destructive usage of
 the returned list is intended."
   (abstract-array-dimensions array))
 
-;;; Redefine and copy-list, because, we don't want users
-;;; to assume destructive modification is okay
-(defpolymorph array-dimensions ((array abstract-array)) list
-  "Returns a COPY of the dimensions of ARRAY. The copy may then be modified.
-
-See NARRAY-DIMENSIONS or equivalent of a copy is to be avoided, and destructive
-use is not intended."
-  (copy-list (abstract-array-dimensions array)))
-
-(declaim (inline array-dimension))
-(defun array-dimension (array axis-number)
-  (nth axis-number (array-dimensions array)))
-
-(declaim (inline arrayp))
-(defun arrayp (object)
-  (or (cl:arrayp object)
-      (typep object 'abstract-array)))
-
-
 ;; FIXME: SBCL doesn't call the compiler-macro on APPLY, does anyone do it?
 (define-polymorphic-function aref (array &rest subscripts) :overwrite t
   :documentation "This is SETF-able."

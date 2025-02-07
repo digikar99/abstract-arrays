@@ -83,10 +83,12 @@ actual ELEMENT-TYPE corresponding to ARRAY-RANK in ENV.
 ARRAY-TYPE is expected to be a subtype of ABSTRACT-ARRAY.
 See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
   (let ((array-type (peltadot:typexpand array-type env)))
-    (assert (subtypep array-type 'abstract-array)
-            ()
-            "Expected ARRAY-TYPE to be a SUBTYPE of ABSTRACT-ARRAYS:ABSTRACT-ARRAY but is~%  ~S"
-            array-type)
+    (optima:ematch array-type
+      ((list* 'specializing array-class _)
+       (assert (subclassp array-class 'abstract-array)
+           ()
+           "Expected ARRAY-TYPE to be a SUBTYPE of ABSTRACT-ARRAYS:ABSTRACT-ARRAY but is~%  ~S"
+           array-type)))
     (if (and (listp array-type)
              (eq 'and (first array-type)))
         (loop :for (element-type-p-fn-name . element-type) :in *element-type-p-fn-name-element-type-alist*
@@ -101,10 +103,12 @@ corresponding to ARRAY-RANK in ENV.
 ARRAY-TYPE is expected to be a subtype of ABSTRACT-ARRAY.
 See also: DEFINE-ARRAY-SPECIALIZATIONS and DEFINE-ARRAY-SPECIALIZATION-TYPE"
   (let ((array-type (peltadot:typexpand array-type env)))
-    (assert (subtypep array-type 'abstract-array)
-            ()
-            "Expected ARRAY-TYPE to be a SUBTYPE of ABSTRACT-ARRAYS:ABSTRACT-ARRAY but is~%  ~S"
-            array-type)
+    (optima:ematch array-type
+      ((list* 'specializing array-class _)
+       (assert (subclassp array-class 'abstract-array)
+           ()
+           "Expected ARRAY-TYPE to be a SUBTYPE of ABSTRACT-ARRAYS:ABSTRACT-ARRAY but is~%  ~S"
+           array-type)))
     (if (and (listp array-type)
              (eq 'and (first array-type)))
         (loop :for (rank-p-fn-name . rank) :in *rank-p-fn-name-rank-alist*
