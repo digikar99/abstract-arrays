@@ -7,7 +7,8 @@
 (in-package #:abstract-arrays/defpackage)
 
 (defun export-symbols ()
-  '(#:abstract-array
+  '(#:array
+    #:abstract-array
     #:abstract-array-class
 
     #:array-storage

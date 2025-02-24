@@ -49,17 +49,17 @@ This is substituted with a error-ing :initform."
 
 (define-ordered-class-with-required-slots abstract-array (t)
   ((storage      :required t
-                 :polymorph t :reader array-storage)
+                 :reader abstract-array-storage)
    ;; This list is not expected to be modified; therefore, we do a bit unusual thing
    ;; to bring attention of the user
    (dimensions   :required t :type list
-                 :polymorph nil :reader abstract-array-dimensions)
+                 :reader abstract-array-dimensions)
    (element-type :required t
-                 :polymorph t :reader array-element-type)
+                 :reader abstract-array-element-type)
    (rank         :required t :type (integer 0 #.array-rank-limit)
-                 :polymorph t :reader array-rank)
+                 :reader abstract-array-rank)
    (total-size   :required t :type (integer 0 #.array-total-size-limit)
-                 :polymorph t :reader array-total-size))
+                 :reader abstract-array-total-size))
   (:metaclass abstract-array-class)
   (:order #.+abstract-array-slot-order+))
 
@@ -100,3 +100,18 @@ as ABSTRACT-ARRAY-CLASS. Also defines the appropriate order using DIRECT-SLOTS."
      ,direct-slots
      (:order ,(append +abstract-array-slot-order+ (mapcar #'first direct-slots)))
      ,@slot-options))
+
+(define-trait-implementation array abstract-array ()
+
+;;; copy-list, because, we don't want users to assume destructive modification is okay
+  (defun array-dimensions (array)
+    "Returns a COPY of the dimensions of ARRAY. The copy may then be modified.
+
+See NARRAY-DIMENSIONS or equivalent of a copy is to be avoided, and destructive
+use is not intended."
+    (copy-list (abstract-array-dimensions array)))
+  (defun array-dimension (array index) (nth index (abstract-array-dimensions array)))
+  (defun array-rank (array) (abstract-array-rank array))
+  (defun array-element-type (array) (abstract-array-element-type array))
+  (defun array-total-size (array) (abstract-array-total-size array))
+  (defun array-storage (array) (abstract-array-storage array)))

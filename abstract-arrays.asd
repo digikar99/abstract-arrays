@@ -1,6 +1,6 @@
 (defsystem "abstract-arrays"
   :author "Shubhamkar B. Ayare (shubhamayare@yahoo.co.in)"
-  :version "0.3.2"
+  :version "0.4.0"
   :description "Julia's AbstractArray like abstraction for Common Lisp."
   :licence "MIT"
   :depends-on ("alexandria"
@@ -11,6 +11,7 @@
   :components ((:file "pre-package")
                (:file "package")
                (:file "abstract-array-ordered-class")
+               (:file "array-trait")
                (:file "abstract-array")
                (:file "remaining-protocol")
                (:file "specializations")

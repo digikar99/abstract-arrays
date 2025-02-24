@@ -113,7 +113,7 @@
 (defun generate-ordered-class-slot-specifiers (slots order)
   (mapcar
    (lambda (x)
-     (destructuring-bind (slot-name . slot-options) x
+     (destructuring-bind (slot-name &rest slot-options) x
        (let ((to-remove (if (find slot-name order)
                             '(:inline :reader :writer :accessor :polymorph)
                             '(:inline))))
